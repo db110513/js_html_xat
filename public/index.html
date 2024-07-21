@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xat</title>
+    <style>
+        ul { list-style-type: none; margin: 0; padding: 0; }
+        li { padding: 8px; margin-bottom: 10px; background: #f1f1f1; border-radius: 4px; }
+        li.self { background: #d1ffd1; text-align: right; }
+        li.other { background: #f1f1f1; text-align: left; }
+        input { padding: 10px; width: calc(100% - 22px); margin-top: 10px; }
+        #usernameInput { width: calc(100% - 20px); padding: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <form id="usernameForm">
+        <input id="usernameInput" placeholder="Escriu el teu usuari:" autocomplete="off"/>
+        <button>Accepta</button>
+    </form>
+    <form id="form" action="" style="display:none;">
+        <input id="input" autocomplete="off" /><button>Envia</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+        var messages = document.getElementById('messages');
+        var usernameForm = document.getElementById('usernameForm');
+        var usernameInput = document.getElementById('usernameInput');
+        var username;
+
+        usernameForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (usernameInput.value) {
+                username = usernameInput.value;
+                usernameForm.style.display = 'none';
+                form.style.display = 'block';
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', { user: username, msg: input.value });
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', function(data) {
+            var item = document.createElement('li');
+            item.textContent = data.user + ': ' + data.msg;
+            item.className = data.user === username ? 'self' : 'other';
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+</body>
+</html>
