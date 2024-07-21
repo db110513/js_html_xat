@@ -1,2 +1,2 @@
-# js_html_xat
+# XAT
 Xat entre múltiples usuaris
